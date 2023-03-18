@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Full Page Color</title>
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+    <meta name="description" content="Turn your monitor into a colored light source!">
+    <style>
+      * {
+        overflow: hidden;
+        margin: 0px;
+        touch-action: manipulation;
+      }
+    </style>
+  </head>
+  <body oncontextmenu="return false">
+    <script>
+      let panel = document.createElement('div');
+      
+      let updateSize = () => {
+        panel.style.width = window.innerWidth + 'px';
+        panel.style.height = window.innerHeight + 'px';
+      }
+      updateSize();
+      window.addEventListener('resize', updateSize);
+
+      let hsl = [0, 100, 0];
+      let hslString = () => `hsl(${hsl[0]}, ${hsl[1]}%, ${hsl[2]}%)`;
+      let updateColor = () => { panel.style.backgroundColor = hslString(); };
+      panel.addEventListener('mousemove', e => {
+        hsl[0] = e.clientX / window.innerWidth * 359;
+        hsl[2] = e.clientY / window.innerHeight * 100;
+        updateColor();
+      });
+
+      // Change S every 35ms by changeBy while the mouse is down 
+      let SUpdaterID;
+      let SUpdater = (changeBy) => setInterval(() => {
+        let newS = hsl[1] + changeBy;
+        hsl[1] = (newS >= 0 && newS <= 100) ? newS : hsl[1];
+        updateColor();
+      }, 35);
+      
+      panel.addEventListener("mousedown", e => {
+        SUpdaterID = SUpdater(e.which === 1 ? 1 : -1);
+      });
+      panel.addEventListener("mouseup", () => clearInterval(SUpdaterID));
+
+      document.body.appendChild(panel);
+    </script>
+  </body>
+</html>
